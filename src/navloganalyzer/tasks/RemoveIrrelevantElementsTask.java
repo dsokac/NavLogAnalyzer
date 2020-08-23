@@ -31,12 +31,16 @@ public class RemoveIrrelevantElementsTask extends SwingWorker<List<Events>, Obje
     @Override
     protected List<Events> doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.RemoveIrrelevantElementsTask.doInBackground()");
-        this.listener.onTaskStarted(AppConstants.Tasks.REMOVE_ELEMENTS_TASK);
+        this.listener.onTaskStarted("Removing irrelevant elements from memory...");
         List<Events> processedEventsList = new ArrayList<>();
+        for(Events events : eventsList) {
+            total += events.getEventList().size();
+        }
         for(Events events : eventsList) {
             Events processedEvents = new Events();
             List<XmlEvent> eventList = new ArrayList<>();
             for(XmlEvent event : events.getEventList()) {
+                this.updateProgressStatus();
                 if(event.getEventData() != null && event.getEventData().getTargetUserName().startsWith("student")) {
                     eventList.add(event);
                 }
@@ -52,6 +56,12 @@ public class RemoveIrrelevantElementsTask extends SwingWorker<List<Events>, Obje
     protected void done() {
         System.out.println("navloganalyzer.tasks.RemoveIrrelevantElementsTask.done()");    
         this.listener.onTaskFinished(AppConstants.Tasks.REMOVE_ELEMENTS_TASK, eventsList);
+    }
+    
+    private void updateProgressStatus() {
+        current++;
+        int percent = (int)((current / (float)total) * 100);
+        this.listener.onProgressStatusChanged(percent);
     }
     
     public interface Listener {
