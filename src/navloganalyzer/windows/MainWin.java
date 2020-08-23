@@ -177,8 +177,10 @@ public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listen
     // End of variables declaration//GEN-END:variables
     private ProgressBarPanel progressBarPanel;
     private NoDataPanel noDataPanel;
+    private int previousProgress = 0;
     
     private void startProgressBar(String taskDescription) {
+        previousProgress = 0;
         this.progressBarPanel = new ProgressBarPanel();
         JLabel currentAction = this.progressBarPanel.getCurrentActionLabel();
         currentAction.setText(taskDescription);     
@@ -189,10 +191,12 @@ public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listen
     }
     
     private void updateProgressBar(int progress) {
-        JProgressBar progressBar = this.progressBarPanel.getProgressBar();
-         System.out.println("WIN Progress = " + progress);
-         progressBar.setValue(progress);
-         this.progressBarPanel.validate();
+        if(previousProgress != progress) {
+            previousProgress = progress;
+            JProgressBar progressBar = this.progressBarPanel.getProgressBar();
+            progressBar.setValue(progress);
+            this.progressBarPanel.validate();
+        }
     }
     
     private void stopProgressBar() {
