@@ -21,8 +21,8 @@ public class UploadFilesMenuItem extends AppAbstractMenuItem{
             public void actionPerformed(ActionEvent e) {
                 File[] chosen = WindowUtils.fetchChosenFiles(getMenu().getMenuBar().getFrame());
                 if(chosen != null) {
-                    FileUploadTask task = new FileUploadTask(chosen, (FilesUploadListener)getMenu().getMenuBar().getFrame());
-                    task.execute();
+                    /*FileUploadTask task = new FileUploadTask(chosen, (FilesUploadListener)getMenu().getMenuBar().getFrame());
+                    task.execute();*/
                 }
             }
         });
