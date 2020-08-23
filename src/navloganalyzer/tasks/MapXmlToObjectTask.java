@@ -6,6 +6,11 @@
 package navloganalyzer.tasks;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,12 +22,12 @@ import navloganalyzer.AppConstants;
 import navloganalyzer.models.Events;
 import navloganalyzer.utils.FilesUtils;
 
-public class MapXmlToObjectTask extends SwingWorker<Void, Object>{
+public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
 
-    private Events events;
+    private List<Events> events = new ArrayList<>();
     
     @Override
-    protected Void doInBackground() throws Exception {
+    protected List<Events> doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.MapXmlToObjectTask.doInBackground()");
         File location = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
         System.out.println(location);
@@ -40,8 +45,8 @@ public class MapXmlToObjectTask extends SwingWorker<Void, Object>{
                         StreamSource source = new StreamSource(item);
                         xsr = xif.createXMLStreamReader(source);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                        Events data = (Events) jaxbUnmarshaller.unmarshal(xsr);
-                        System.out.println(data);
+                        events.add((Events) jaxbUnmarshaller.unmarshal(xsr));
+                        System.out.println(events);
                     }
                     catch (JAXBException e) 
                     {
@@ -59,6 +64,20 @@ public class MapXmlToObjectTask extends SwingWorker<Void, Object>{
         }
         return null;
     }
+
+    @Override
+    protected void done() {
+        System.out.println("navloganalyzer.tasks.MapXmlToObjectTask.done()");
+        RemoveIrrelevantElementsTask task = new RemoveIrrelevantElementsTask(events);
+        task.execute();
+        try {
+            List<Events> processed = task.get();
+            System.out.println("processed");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MapXmlToObjectTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(MapXmlToObjectTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
       
-    
 }
