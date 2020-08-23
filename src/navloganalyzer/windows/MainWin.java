@@ -8,19 +8,22 @@ package navloganalyzer.windows;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import navloganalyzer.listeners.CleanFileListener;
 import navloganalyzer.listeners.FilesUploadListener;
+import navloganalyzer.models.Events;
 import navloganalyzer.tasks.CleanXmlTask;
 import navloganalyzer.tasks.FileUploadTask;
+import navloganalyzer.tasks.RemoveIrrelevantElementsTask;
 import navloganalyzer.utils.WindowUtils;
 
 /**
  *
  * @author DanijelSokac
  */
-public class MainWin extends javax.swing.JFrame implements FilesUploadListener, CleanFileListener{
+public class MainWin extends javax.swing.JFrame implements FilesUploadListener, CleanFileListener, RemoveIrrelevantElementsTask.Listener{
 
     /**
      * Creates new form MainWin
@@ -178,24 +181,38 @@ public class MainWin extends javax.swing.JFrame implements FilesUploadListener, 
     private ProgressBarPanel progressBarPanel;
     private NoDataPanel noDataPanel;
     
-    
-    @Override
-    public void onUploadStarted() {
-        System.out.println("navloganalyzer.windows.MainWin.onUploadStarted()");
+    private void startProgressBar(String taskDescription) {
         this.progressBarPanel = new ProgressBarPanel();
         JLabel currentAction = this.progressBarPanel.getCurrentActionLabel();
-        currentAction.setText("Uploading files...");     
+        currentAction.setText(taskDescription);     
         this.noDataPanel.setVisible(false);
         this.centerPanel.add(this.progressBarPanel, BorderLayout.CENTER);
         this.centerPanel.setSize(this.progressBarPanel.getSize());
         this.centerPanel.validate();
     }
+    
+    private void updateProgressBar(int progress) {
+        JProgressBar progressBar = this.progressBarPanel.getProgressBar();
+         System.out.println("WIN Progress = " + progress);
+         progressBar.setValue(progress);
+         this.progressBarPanel.validate();
+    }
+    
+    private void stopProgressBar() {
+        this.progressBarPanel.setVisible(false);
+        this.centerPanel.validate();
+    }
+    
+    @Override
+    public void onUploadStarted() {
+        System.out.println("navloganalyzer.windows.MainWin.onUploadStarted()");
+        this.startProgressBar("Uploading files...");
+    }
 
     @Override
     public void onUploadFinished() {
         System.out.println("navloganalyzer.windows.MainWin.onUploadFinished()");
-        this.progressBarPanel.setVisible(false);
-        this.centerPanel.validate();
+        this.stopProgressBar();
         CleanXmlTask cleanTask = new CleanXmlTask(StandardCharsets.UTF_8, this);
         cleanTask.execute();
     }
@@ -203,28 +220,37 @@ public class MainWin extends javax.swing.JFrame implements FilesUploadListener, 
     @Override
     public void onProgressStatusChanged(int progress) {
         System.out.println("navloganalyzer.windows.MainWin.onProgressStatusChanged()");
-         JProgressBar progressBar = this.progressBarPanel.getProgressBar();
-         System.out.println("WIN Progress = " + progress);
-         progressBar.setValue(progress);
-         this.progressBarPanel.validate();
+        this.updateProgressBar(progress);
     }
 
     @Override
     public void onCleanStarted() {
         System.out.println("navloganalyzer.windows.MainWin.onCleanStarted()");
-        this.progressBarPanel = new ProgressBarPanel();
-        JLabel currentAction = this.progressBarPanel.getCurrentActionLabel();
-        currentAction.setText("Cleaning files...");     
-        this.noDataPanel.setVisible(false);
-        this.centerPanel.add(this.progressBarPanel, BorderLayout.CENTER);
-        this.centerPanel.setSize(this.progressBarPanel.getSize());
-        this.centerPanel.validate();
+        this.startProgressBar("Cleaning files...");
     }
 
     @Override
     public void onCleanFinished() {
         System.out.println("navloganalyzer.windows.MainWin.onCleanFinished()");
-        this.progressBarPanel.setVisible(false);
-        this.centerPanel.validate();
+        this.stopProgressBar();
+        
+    }
+
+    @Override
+    public void onTaskStarted() {
+        System.out.println("navloganalyzer.windows.MainWin.onTaskStarted()");
+        this.startProgressBar("Removing irrelevant elements...");
+    }
+
+    @Override
+    public void onTaskFinished(List<Events> eventsList) {
+        System.out.println("navloganalyzer.windows.MainWin.onTaskFinished()");
+        this.stopProgressBar();
+    }
+
+    @Override
+    public void onTaskProgressUpdate(int progress) {
+        System.out.println("navloganalyzer.windows.MainWin.onTaskProgressUpdate()");
+        this.updateProgressBar(progress);
     }
 }
