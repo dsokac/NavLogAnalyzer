@@ -11,11 +11,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
-import navloganalyzer.listeners.CleanFileListener;
-import navloganalyzer.listeners.FilesUploadListener;
+import navloganalyzer.AppConstants;
 import navloganalyzer.models.Events;
 import navloganalyzer.tasks.CleanXmlTask;
 import navloganalyzer.tasks.FileUploadTask;
+import navloganalyzer.tasks.MapXmlToObjectTask;
 import navloganalyzer.tasks.RemoveIrrelevantElementsTask;
 import navloganalyzer.utils.WindowUtils;
 
@@ -23,7 +23,7 @@ import navloganalyzer.utils.WindowUtils;
  *
  * @author DanijelSokac
  */
-public class MainWin extends javax.swing.JFrame implements FilesUploadListener, CleanFileListener, RemoveIrrelevantElementsTask.Listener{
+public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listener, CleanXmlTask.Listener, MapXmlToObjectTask.Listener, RemoveIrrelevantElementsTask.Listener{
 
     /**
      * Creates new form MainWin
@@ -130,7 +130,7 @@ public class MainWin extends javax.swing.JFrame implements FilesUploadListener, 
     private void uploadFilesItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadFilesItemActionPerformed
         File[] chosen = WindowUtils.fetchChosenFiles(this);
         if(chosen != null) {
-            FileUploadTask task = new FileUploadTask(chosen, (FilesUploadListener)this);
+            FileUploadTask task = new FileUploadTask(chosen, this);
             task.execute();
         }
     }//GEN-LAST:event_uploadFilesItemActionPerformed
@@ -203,54 +203,51 @@ public class MainWin extends javax.swing.JFrame implements FilesUploadListener, 
         this.centerPanel.validate();
     }
     
-    @Override
-    public void onUploadStarted() {
-        System.out.println("navloganalyzer.windows.MainWin.onUploadStarted()");
-        this.startProgressBar("Uploading files...");
+    private void handleTaskChain(String taskName, Object data) {
+        switch(taskName) {
+            case AppConstants.Tasks.UPLOAD_TASK: 
+                CleanXmlTask cleanTask = new CleanXmlTask(StandardCharsets.UTF_8, this);
+                cleanTask.execute();
+                break;
+            case AppConstants.Tasks.CLEAN_FILES_TASK:
+                MapXmlToObjectTask mapTask = new MapXmlToObjectTask(this);
+                mapTask.execute();
+                break;
+            case AppConstants.Tasks.MAP_TO_JAVA_TASK:
+                RemoveIrrelevantElementsTask removeTask = new RemoveIrrelevantElementsTask(this,(List<Events>)data);
+                removeTask.execute();
+        }
     }
 
     @Override
-    public void onUploadFinished() {
-        System.out.println("navloganalyzer.windows.MainWin.onUploadFinished()");
-        this.stopProgressBar();
-        CleanXmlTask cleanTask = new CleanXmlTask(StandardCharsets.UTF_8, this);
-        cleanTask.execute();
+    public void onTaskStarted(String taskDescription) {
+        System.out.println("navloganalyzer.windows.MainWin.onTaskStarted()");
+        this.startProgressBar(taskDescription);
     }
-
+    
     @Override
+    public void onTaskProgressChanged(int progress) {
+        System.out.println("navloganalyzer.windows.MainWin.onProgressStatusChanged()");
+        this.updateProgressBar(progress);
+    }
+    
+     @Override
     public void onProgressStatusChanged(int progress) {
         System.out.println("navloganalyzer.windows.MainWin.onProgressStatusChanged()");
         this.updateProgressBar(progress);
     }
 
     @Override
-    public void onCleanStarted() {
-        System.out.println("navloganalyzer.windows.MainWin.onCleanStarted()");
-        this.startProgressBar("Cleaning files...");
-    }
-
-    @Override
-    public void onCleanFinished() {
-        System.out.println("navloganalyzer.windows.MainWin.onCleanFinished()");
-        this.stopProgressBar();
-        
-    }
-
-    @Override
-    public void onTaskStarted() {
-        System.out.println("navloganalyzer.windows.MainWin.onTaskStarted()");
-        this.startProgressBar("Removing irrelevant elements...");
-    }
-
-    @Override
-    public void onTaskFinished(List<Events> eventsList) {
+    public void onTaskFinished(String taskName) {
         System.out.println("navloganalyzer.windows.MainWin.onTaskFinished()");
         this.stopProgressBar();
+        this.handleTaskChain(taskName, null);
     }
-
+    
     @Override
-    public void onTaskProgressUpdate(int progress) {
-        System.out.println("navloganalyzer.windows.MainWin.onTaskProgressUpdate()");
-        this.updateProgressBar(progress);
+    public void onTaskFinished(String taskName, List<Events> eventsList) {
+        System.out.println("navloganalyzer.windows.MainWin.onTaskFinished()");
+        this.stopProgressBar();
+        this.handleTaskChain(taskName, eventsList);
     }
 }

@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import navloganalyzer.AppConstants;
 import navloganalyzer.NavLogAnalyzer;
-import navloganalyzer.listeners.FilesUploadListener;
 import navloganalyzer.utils.FilesUtils;
 
 /**
@@ -23,16 +22,16 @@ public class FileUploadTask extends SwingWorker<File[], Object>{
 
     private File[] chosenFiles = null;
     private File[] uploadedFiles = null;
-    private FilesUploadListener listener;
+    private Listener listener;
     
-    public FileUploadTask(File[] chosenFiles, FilesUploadListener listener) {
+    public FileUploadTask(File[] chosenFiles, Listener listener) {
         this.chosenFiles = chosenFiles;
         this.listener = listener;
     }
     
     @Override
     protected File[] doInBackground() throws Exception {
-        this.listener.onUploadStarted();
+        this.listener.onTaskStarted("Uploading files...");
         this.uploadedFiles = new File[this.chosenFiles.length];
         int count = 0;
         for(File file : this.chosenFiles) {
@@ -42,7 +41,7 @@ public class FileUploadTask extends SwingWorker<File[], Object>{
                 File storedFile = FilesUtils.storeFile(folderLocation, file, StandardCharsets.UTF_8);
                 this.uploadedFiles[count++] = storedFile;
                 int progress = (int)((count/(double)this.chosenFiles.length)*100);
-                this.listener.onProgressStatusChanged(progress);
+                this.listener.onTaskProgressChanged(progress);
             } catch (Exception ex) {
                 Logger.getLogger(NavLogAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -52,10 +51,14 @@ public class FileUploadTask extends SwingWorker<File[], Object>{
 
     @Override
     protected void done() {
-        this.listener.onUploadFinished();
+        this.listener.onTaskFinished(AppConstants.Tasks.UPLOAD_TASK);
     }
     
     
-  
-    
+    public interface Listener {
+        void onTaskStarted(String taskDescription);
+        void onTaskFinished(String taskName);
+        void onTaskProgressChanged(int progress);
+    }
+
 }

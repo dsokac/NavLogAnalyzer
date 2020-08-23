@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import javax.swing.SwingWorker;
 import navloganalyzer.AppConstants;
-import navloganalyzer.listeners.CleanFileListener;
 import navloganalyzer.listeners.ProgressListener;
 import navloganalyzer.utils.FilesUtils;
 import navloganalyzer.utils.XmlUtils;
@@ -15,9 +14,9 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
     private int numberOfFiles = -1;
     private int currentProgress = 0;
     private int totalProgress = -1;
-    private CleanFileListener listener;
+    private Listener listener;
     
-    public CleanXmlTask(Charset charset, CleanFileListener listener) {
+    public CleanXmlTask(Charset charset, Listener listener) {
         this.charset = charset;
         this.listener = listener;
     }
@@ -25,7 +24,7 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
     @Override
     protected Void doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.CleanXmlTask.doInBackground()");
-        listener.onCleanStarted();
+        listener.onTaskStarted("Cleaning files...");
         File rawFilesLocation = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.RAW_FILES_ENTRY_LOCATION);
         File cleanFilesLocation = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
         
@@ -50,9 +49,7 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
     @Override
     protected void done() {
         System.out.println("navloganalyzer.tasks.CleanXmlTask.done()");
-        listener.onCleanFinished();
-        MapXmlToObjectTask task = new MapXmlToObjectTask();
-        task.execute();
+        listener.onTaskFinished(AppConstants.Tasks.CLEAN_FILES_TASK);
     }
 
     @Override
@@ -63,8 +60,13 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
         System.out.println("currentProgress = " + currentProgress);
         System.out.println("totalProgress = " + totalProgress);
         System.out.println("Percent = " + percent);
-        listener.onProgressStatusChanged(percent);
+        listener.onTaskProgressChanged(percent);
     }
     
+    public interface Listener {
+        void onTaskStarted(String taskDescription);
+        void onTaskFinished(String taskName);
+        void onTaskProgressChanged(int progress);
+    }
     
 }

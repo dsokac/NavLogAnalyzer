@@ -15,6 +15,8 @@ import javax.swing.SwingWorker;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
@@ -25,13 +27,22 @@ import navloganalyzer.utils.FilesUtils;
 public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
 
     private List<Events> events = new ArrayList<>();
+    private Listener listener;
+    private int total = 0;
+    private int current = 0;
+    
+    public MapXmlToObjectTask(Listener listener) {
+        this.listener = listener;
+    }
     
     @Override
     protected List<Events> doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.MapXmlToObjectTask.doInBackground()");
+        this.listener.onTaskStarted("Mapping XML to Java...");
         File location = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
         System.out.println(location);
         if(location.exists()) {
+            total = location.listFiles().length;
             for(File item : location.listFiles()) {
                 System.out.println("Item: " + item);
                 if(item.isFile()) {  
@@ -47,6 +58,9 @@ public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                         events.add((Events) jaxbUnmarshaller.unmarshal(xsr));
                         System.out.println(events);
+                        current++;
+                        int percent = (int)((current / (float)total) * 100);
+                        this.listener.onProgressStatusChanged(percent);
                     }
                     catch (JAXBException e) 
                     {
@@ -68,16 +82,13 @@ public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
     @Override
     protected void done() {
         System.out.println("navloganalyzer.tasks.MapXmlToObjectTask.done()");
-        RemoveIrrelevantElementsTask task = new RemoveIrrelevantElementsTask(events);
-        task.execute();
-        try {
-            List<Events> processed = task.get();
-            System.out.println("processed");
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MapXmlToObjectTask.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(MapXmlToObjectTask.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.listener.onTaskFinished(AppConstants.Tasks.MAP_TO_JAVA_TASK, events);
+    }
+    
+    public interface Listener {
+        void onTaskStarted(String taskDescription);
+        void onTaskFinished(String taskName, List<Events> eventsList);
+        void onProgressStatusChanged(int progress);
     }
       
 }

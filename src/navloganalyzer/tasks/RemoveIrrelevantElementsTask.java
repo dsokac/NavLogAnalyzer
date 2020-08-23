@@ -8,6 +8,7 @@ package navloganalyzer.tasks;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingWorker;
+import navloganalyzer.AppConstants;
 import navloganalyzer.models.Events;
 import navloganalyzer.models.XmlEvent;
 
@@ -18,14 +19,19 @@ import navloganalyzer.models.XmlEvent;
 public class RemoveIrrelevantElementsTask extends SwingWorker<List<Events>, Object>{
 
     private List<Events> eventsList = null;
+    private Listener listener;
+    private int total = 0;
+    private int current = 0;
     
-    public RemoveIrrelevantElementsTask(List<Events> eventsList) {
+    public RemoveIrrelevantElementsTask(Listener listener, List<Events> eventsList) {
         this.eventsList = eventsList;
+        this.listener = listener;
     }
     
     @Override
     protected List<Events> doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.RemoveIrrelevantElementsTask.doInBackground()");
+        this.listener.onTaskStarted(AppConstants.Tasks.REMOVE_ELEMENTS_TASK);
         List<Events> processedEventsList = new ArrayList<>();
         for(Events events : eventsList) {
             Events processedEvents = new Events();
@@ -44,13 +50,14 @@ public class RemoveIrrelevantElementsTask extends SwingWorker<List<Events>, Obje
     
     @Override
     protected void done() {
-        System.out.println("navloganalyzer.tasks.RemoveIrrelevantElementsTask.done()");
+        System.out.println("navloganalyzer.tasks.RemoveIrrelevantElementsTask.done()");    
+        this.listener.onTaskFinished(AppConstants.Tasks.REMOVE_ELEMENTS_TASK, eventsList);
     }
     
     public interface Listener {
-        void onTaskStarted();
-        void onTaskFinished(List<Events> eventsList);
-        void onTaskProgressUpdate(int progress);
+        void onTaskStarted(String taskDescription);
+        void onTaskFinished(String taskName, List<Events> eventsList);
+        void onProgressStatusChanged(int progress);
     }
     
 }
