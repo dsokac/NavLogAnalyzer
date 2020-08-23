@@ -32,10 +32,7 @@ public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listen
         initComponents();
         this.noDataPanel = new NoDataPanel();
         this.centerPanel.add(noDataPanel);
-        this.centerPanel.validate();
-        CleanXmlTask cleanTask = new CleanXmlTask(StandardCharsets.UTF_8, this);
-        cleanTask.execute();
-        
+        this.centerPanel.validate();        
     }
 
     /**
