@@ -13,9 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import navloganalyzer.AppConstants;
 import navloganalyzer.models.Events;
+import navloganalyzer.models.FilteredDataItem;
 import navloganalyzer.tasks.CleanXmlTask;
 import navloganalyzer.tasks.FileUploadTask;
 import navloganalyzer.tasks.MapXmlToObjectTask;
+import navloganalyzer.tasks.RemoveDuplicatesTask;
 import navloganalyzer.tasks.RemoveIrrelevantElementsTask;
 import navloganalyzer.utils.WindowUtils;
 
@@ -23,7 +25,12 @@ import navloganalyzer.utils.WindowUtils;
  *
  * @author DanijelSokac
  */
-public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listener, CleanXmlTask.Listener, MapXmlToObjectTask.Listener, RemoveIrrelevantElementsTask.Listener{
+public class MainWin extends javax.swing.JFrame 
+        implements  FileUploadTask.Listener, 
+                    CleanXmlTask.Listener, 
+                    MapXmlToObjectTask.Listener, 
+                    RemoveIrrelevantElementsTask.Listener, 
+                    RemoveDuplicatesTask.Listener{
 
     /**
      * Creates new form MainWin
@@ -217,6 +224,10 @@ public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listen
             case AppConstants.Tasks.MAP_TO_JAVA_TASK:
                 RemoveIrrelevantElementsTask removeTask = new RemoveIrrelevantElementsTask(this,(List<Events>)data);
                 removeTask.execute();
+                break;
+            case AppConstants.Tasks.REMOVE_ELEMENTS_TASK:
+                RemoveDuplicatesTask duplicatesTask = new RemoveDuplicatesTask((List<FilteredDataItem>)data, this);
+                duplicatesTask.execute();
         }
     }
 
