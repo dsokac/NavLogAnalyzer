@@ -11,5 +11,6 @@ public abstract class AppConstants {
         String CLEAN_FILES_TASK = "clean files";
         String REMOVE_ELEMENTS_TASK = "remove irrelevent elements";
         String MAP_TO_JAVA_TASK = "map xml to java";
+        String REMOVE_DUPLICATES_TASK = "remove duplicates task";
     }
 }
