@@ -13,4 +13,9 @@ public abstract class AppConstants {
         String MAP_TO_JAVA_TASK = "map xml to java";
         String REMOVE_DUPLICATES_TASK = "remove duplicates task";
     }
+    
+    public interface WinEvent {
+        int LOG_ON = 4624;
+        int LOG_OFF = 4634;
+    }
 }
