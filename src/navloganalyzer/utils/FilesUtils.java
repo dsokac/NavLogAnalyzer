@@ -5,16 +5,19 @@
  */
 package navloganalyzer.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import navloganalyzer.AppConstants;
 
 /**
  *
@@ -67,6 +70,21 @@ public abstract class FilesUtils {
         fos = new FileOutputStream(new File(location, fileName), false);
         sc = new Scanner
         return null;*/
+    }
+    
+    public static File writeToFile(File location, String fileName, List<String> lines, Charset charset) throws FileNotFoundException, IOException {
+        File file = new File(location, fileName);
+	FileOutputStream fos = new FileOutputStream(file);
+ 
+	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos, charset));
+ 
+	for (String line : lines) {
+		bw.write(line);
+		bw.newLine();
+	}
+ 
+	bw.close();
+        return file;
     }
     
     public static File storeFile(File location, File file, Charset charset) throws Exception {
