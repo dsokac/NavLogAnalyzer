@@ -246,9 +246,9 @@ public class MainWin extends javax.swing.JFrame implements FileUploadTask.Listen
     }
     
     @Override
-    public void onTaskFinished(String taskName, List<Events> eventsList) {
+    public void onTaskFinished(String taskName, Object result) {
         System.out.println("navloganalyzer.windows.MainWin.onTaskFinished()");
         this.stopProgressBar();
-        this.handleTaskChain(taskName, eventsList);
+        this.handleTaskChain(taskName, result);
     }
 }

@@ -87,7 +87,7 @@ public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
     
     public interface Listener {
         void onTaskStarted(String taskDescription);
-        void onTaskFinished(String taskName, List<Events> eventsList);
+        void onTaskFinished(String taskName, Object eventsList);
         void onProgressStatusChanged(int progress);
     }
       
