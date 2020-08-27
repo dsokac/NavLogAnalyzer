@@ -8,7 +8,6 @@ package navloganalyzer.windows;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;

@@ -5,12 +5,9 @@
  */
 package navloganalyzer.windows;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import navloganalyzer.models.StudentAttendanceItem;
 
 /**
