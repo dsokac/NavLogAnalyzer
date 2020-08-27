@@ -3,6 +3,7 @@ package navloganalyzer.models;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import navloganalyzer.AppConstants;
 
 public class FilteredDataItem {
     
@@ -60,6 +61,12 @@ public class FilteredDataItem {
         this.createdAt = createdAt;
     }
     
+    public boolean isLogOn() {
+        return this.eventId == AppConstants.WinEvent.LOG_ON;
+    }
     
+    public boolean isLogOff() {
+        return this.eventId == AppConstants.WinEvent.LOG_OFF;
+    }
     
 }
