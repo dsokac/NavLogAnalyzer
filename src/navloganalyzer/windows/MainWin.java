@@ -8,12 +8,14 @@ package navloganalyzer.windows;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import navloganalyzer.AppConstants;
 import navloganalyzer.models.Events;
 import navloganalyzer.models.FilteredDataItem;
+import navloganalyzer.models.StudentAttendanceItem;
 import navloganalyzer.tasks.CleanXmlTask;
 import navloganalyzer.tasks.FileUploadTask;
 import navloganalyzer.tasks.MapXmlToObjectTask;
@@ -39,7 +41,7 @@ public class MainWin extends javax.swing.JFrame
         initComponents();
         this.noDataPanel = new NoDataPanel();
         this.centerPanel.add(noDataPanel);
-        this.centerPanel.validate();        
+        this.centerPanel.validate();
     }
 
     /**
@@ -184,6 +186,7 @@ public class MainWin extends javax.swing.JFrame
     // End of variables declaration//GEN-END:variables
     private ProgressBarPanel progressBarPanel;
     private NoDataPanel noDataPanel;
+    private DataTablePanel dataTablePanel;
     private int previousProgress = 0;
     
     private void startProgressBar(String taskDescription) {
@@ -228,7 +231,18 @@ public class MainWin extends javax.swing.JFrame
             case AppConstants.Tasks.REMOVE_ELEMENTS_TASK:
                 RemoveDuplicatesTask duplicatesTask = new RemoveDuplicatesTask((List<FilteredDataItem>)data, this);
                 duplicatesTask.execute();
+                break;
+            case AppConstants.Tasks.REMOVE_DUPLICATES_TASK:
+                List<StudentAttendanceItem> items = StudentAttendanceItem.convert((List<FilteredDataItem>)data);
+                showTable(items);
+                break;
         }
+    }
+    
+    public void showTable(List<StudentAttendanceItem> data) {
+        dataTablePanel = new DataTablePanel();
+        dataTablePanel.populateTable(data);
+        this.mainPanel.add(dataTablePanel, BorderLayout.CENTER);
     }
 
     @Override
@@ -245,7 +259,6 @@ public class MainWin extends javax.swing.JFrame
     
      @Override
     public void onProgressStatusChanged(int progress) {
-        System.out.println("navloganalyzer.windows.MainWin.onProgressStatusChanged()");
         this.updateProgressBar(progress);
     }
 
