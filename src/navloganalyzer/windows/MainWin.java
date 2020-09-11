@@ -6,6 +6,9 @@
 package navloganalyzer.windows;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -38,9 +41,7 @@ public class MainWin extends javax.swing.JFrame
      */
     public MainWin() {
         initComponents();
-        this.noDataPanel = new NoDataPanel();
-        this.centerPanel.add(noDataPanel);
-        this.centerPanel.validate();
+        initialView();
     }
 
     /**
@@ -170,7 +171,8 @@ public class MainWin extends javax.swing.JFrame
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainWin().setVisible(true);
+                MainWin mw = new MainWin();
+                mw.setVisible(true);
             }
         });
     }
@@ -187,6 +189,29 @@ public class MainWin extends javax.swing.JFrame
     private NoDataPanel noDataPanel;
     private DataTablePanel dataTablePanel;
     private int previousProgress = 0;
+    private MainWin object = this;
+    private ComponentAdapter componentAdapter = new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            mainPanel.setSize(object.getSize());
+            centerPanel.setSize(object.getSize());
+            if(dataTablePanel != null)dataTablePanel.setSize(object.getSize());
+            Component[] components = mainPanel.getComponents();
+            for(int i = 0; i < components.length; i++) {
+                //mainPanel.getComponent(i).setSize(object.getSize());
+            }
+        }
+    };
+    
+    private void initialView() {      
+        setExtendedState(MAXIMIZED_BOTH);
+        noDataPanel = new NoDataPanel(centerPanel);
+        centerPanel.add(noDataPanel);
+        //showTable(new ArrayList<>());
+        
+        
+        addComponentListener(componentAdapter);
+    }
     
     private void startProgressBar(String taskDescription) {
         previousProgress = 0;
@@ -241,7 +266,16 @@ public class MainWin extends javax.swing.JFrame
     public void showTable(List<StudentAttendanceItem> data) {
         dataTablePanel = new DataTablePanel();
         dataTablePanel.populateTable(data);
+        this.centerPanel.setVisible(false);
+        this.mainPanel.setSize(getSize());
         this.mainPanel.add(dataTablePanel, BorderLayout.CENTER);
+        this.dataTablePanel.setSize(this.mainPanel.getSize());
+        this.mainPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                mainPanel.setSize(object.getSize());                
+            }            
+        });
     }
 
     @Override

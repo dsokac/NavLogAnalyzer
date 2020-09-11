@@ -5,7 +5,7 @@
  */
 package navloganalyzer.windows;
 
-import java.awt.Dimension;
+import java.awt.Component;
 
 /**
  *
@@ -16,10 +16,11 @@ public class NoDataPanel extends javax.swing.JPanel {
     /**
      * Creates new form NoDataPanel
      */
-    public NoDataPanel() {
+    public NoDataPanel(Component parent) {
         initComponents();
-        setSize(new Dimension(788, 101));
+        this.parent = parent;
         setVisible(true);
+        setSize(parent.getSize());
     }
 
     /**
@@ -59,4 +60,9 @@ public class NoDataPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel noDataLabel;
     // End of variables declaration//GEN-END:variables
+    private NoDataPanel object = this;
+    private Component parent = null;
+        
+    
+
 }
