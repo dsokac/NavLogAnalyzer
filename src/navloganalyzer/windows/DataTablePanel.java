@@ -5,10 +5,17 @@
  */
 package navloganalyzer.windows;
 
-import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
 import navloganalyzer.models.StudentAttendanceItem;
+import navloganalyzer.utils.MyStringUtils;
 
 /**
  *
@@ -21,7 +28,6 @@ public class DataTablePanel extends javax.swing.JPanel {
      */
     public DataTablePanel() {
         initComponents();
-        setSize(new Dimension(761, 496));
         setVisible(true);
     }
 
@@ -36,6 +42,9 @@ public class DataTablePanel extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         analysisTable = new javax.swing.JTable();
+        tableOptionsPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        cbxStudents = new javax.swing.JComboBox<>();
 
         analysisTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -60,36 +69,135 @@ public class DataTablePanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(analysisTable);
         analysisTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
+        tableOptionsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Mogućnosti"));
+        tableOptionsPanel.setMaximumSize(new java.awt.Dimension(12, 115));
+        tableOptionsPanel.setMinimumSize(new java.awt.Dimension(10, 100));
+
+        jLabel1.setText("Student:");
+        jLabel1.setToolTipText("");
+        jLabel1.setName("lUsername"); // NOI18N
+
+        cbxStudents.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        javax.swing.GroupLayout tableOptionsPanelLayout = new javax.swing.GroupLayout(tableOptionsPanel);
+        tableOptionsPanel.setLayout(tableOptionsPanelLayout);
+        tableOptionsPanelLayout.setHorizontalGroup(
+            tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tableOptionsPanelLayout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxStudents, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        tableOptionsPanelLayout.setVerticalGroup(
+            tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tableOptionsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(cbxStudents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(58, Short.MAX_VALUE))
+        );
+
+        jLabel1.getAccessibleContext().setAccessibleName("Student");
+        jLabel1.getAccessibleContext().setAccessibleDescription("");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1022, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 986, Short.MAX_VALUE)
+                    .addComponent(tableOptionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(79, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap()
+                .addComponent(tableOptionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(110, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable analysisTable;
+    private javax.swing.JComboBox<String> cbxStudents;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel tableOptionsPanel;
     // End of variables declaration//GEN-END:variables
-
+    private Component object = this;
+    private int width = -1;
+    private int height = -1;
+    private List<StudentAttendanceItem> originalData = new ArrayList<>();
+    private List<StudentAttendanceItem> data = new ArrayList<>();
 
     public void populateTable(List<StudentAttendanceItem> data) {
+        populateTable(data, false);
+    }
+    
+    public void populateTable(List<StudentAttendanceItem> data, boolean isFiltering) {
+        if(isFiltering) {
+            this.data = data;
+        } else {
+            this.originalData = data;
+        }
         DefaultTableModel tModel = (DefaultTableModel) analysisTable.getModel();
         tModel.setRowCount(0);
         for(StudentAttendanceItem item : data) {
             tModel.addRow(item.getRow());
         }
+        validate();
+        
+        if(!isFiltering) {
+            List<String> studentList = extractStudentsForCombobox(data);
+            MyStringUtils.sortListItems(studentList);
+            setupCombobox(studentList);
+        }
+    }
+    
+    private List<String> extractStudentsForCombobox(List<StudentAttendanceItem> data) {
+        List<String> studentList = new ArrayList<>(); 
+        for(StudentAttendanceItem item : data) {
+            if(!studentList.contains(item.getUsername())) {
+                studentList.add(item.getUsername());
+            }
+        }
+        return studentList;
+    }
+    
+    private void setupCombobox(List<String> studentList) {
+        cbxStudents.removeAllItems();
+        cbxStudents.addItem("Odaberi...");
+        for(String item : studentList) {
+            cbxStudents.addItem(item);
+        }
+        
+        cbxStudents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedValue = (String)((JComboBox)e.getSource()).getSelectedItem();
+                System.out.println(".actionPerformed() => " + selectedValue);
+                filterData(selectedValue);
+            }
+        });
+    }
+    
+    private void filterData(String key) {
+        Predicate<StudentAttendanceItem> predicate = new Predicate<StudentAttendanceItem>() {
+            @Override
+            public boolean test(StudentAttendanceItem t) {
+               return t.getUsername().equals(key);
+            }
+        };
+        this.data = this.originalData.stream().filter(predicate).collect(Collectors.toList());
+        populateTable(data, true);
     }
 }
