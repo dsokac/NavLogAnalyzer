@@ -1,13 +1,9 @@
 package navloganalyzer.datepicker;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
 import java.util.Properties;
 import javax.swing.JPanel;
 import navloganalyzer.datepicker.formatters.DateLabelFormatter;
 import org.jdatepicker.DateModel;
-import org.jdatepicker.JDatePanel;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
