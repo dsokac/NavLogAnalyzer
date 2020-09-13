@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 public abstract class FilesUtils {
     public static File getUserWorkingDir() {
         return new File(".");
+    }
+    
     public static File getDirectory(File directory, String name) throws Exception {
         return getFileOrDirectory(directory, name, false);
     }
