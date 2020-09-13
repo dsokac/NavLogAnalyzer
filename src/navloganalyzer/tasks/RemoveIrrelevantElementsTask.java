@@ -78,6 +78,8 @@ public class RemoveIrrelevantElementsTask extends SwingWorker<List<FilteredDataI
             FilesUtils.writeToFile(FilesUtils.getUserWorkingDir(), "logAnalysis.txt", lines, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(RemoveIrrelevantElementsTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RemoveIrrelevantElementsTask.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

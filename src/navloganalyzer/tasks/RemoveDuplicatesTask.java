@@ -82,6 +82,8 @@ public class RemoveDuplicatesTask extends SwingWorker<List<FilteredDataItem>, Ob
             FilesUtils.writeToFile(FilesUtils.getUserWorkingDir(), "logAnalysis-noDuplicates.txt", lines, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(RemoveIrrelevantElementsTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RemoveDuplicatesTask.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
