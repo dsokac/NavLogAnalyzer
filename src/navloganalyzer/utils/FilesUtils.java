@@ -5,6 +5,7 @@
  */
 package navloganalyzer.utils;
 
+import com.google.gson.Gson;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Scanner;
@@ -144,5 +146,18 @@ public abstract class FilesUtils {
     
     public static File storeFile(File location, String filename, String content, Charset charset) throws Exception {
         return writeToFile(location, filename, content, charset);
+    }
+    
+    public static void writeJsontoFile(Object data, String folderName, String fileName) throws Exception {
+        File dataFolder = getDirectory(FilesUtils.getUserWorkingDir(), folderName);
+        
+        String content = new Gson().toJson(data);
+        try {
+            FilesUtils.storeFile(dataFolder, fileName, content, StandardCharsets.UTF_8);
+        } catch (IOException ex) {
+            Logger.getLogger(FilesUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(FilesUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
