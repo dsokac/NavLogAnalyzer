@@ -6,6 +6,7 @@
 package navloganalyzer.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -159,5 +160,15 @@ public abstract class FilesUtils {
         } catch (Exception ex) {
             Logger.getLogger(FilesUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static <T> List<T> readJsonArrayFromFile(String folderName, String fileName) throws Exception {
+        File folder = getDirectory(FilesUtils.getUserWorkingDir(), folderName);
+        File file = getFile(folder, fileName);
+        String content = FilesUtils.getFileContent(file, StandardCharsets.UTF_8);
+        List<T> items;    
+        java.lang.reflect.Type listType = new TypeToken<List<T>>() {}.getType();
+        items = new Gson().fromJson(content, listType);
+        return items;
     }
 }

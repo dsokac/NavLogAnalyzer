@@ -12,6 +12,8 @@ import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import navloganalyzer.AppConstants;
@@ -23,6 +25,7 @@ import navloganalyzer.tasks.FileUploadTask;
 import navloganalyzer.tasks.MapXmlToObjectTask;
 import navloganalyzer.tasks.RemoveDuplicatesTask;
 import navloganalyzer.tasks.RemoveIrrelevantElementsTask;
+import navloganalyzer.utils.FilesUtils;
 import navloganalyzer.utils.WindowUtils;
 
 /**
@@ -207,10 +210,18 @@ public class MainWin extends javax.swing.JFrame
         setExtendedState(MAXIMIZED_BOTH);
         noDataPanel = new NoDataPanel(centerPanel);
         centerPanel.add(noDataPanel);
-        //showTable(new ArrayList<>());
+        centerPanel.setVisible(true);
         
         
         addComponentListener(componentAdapter);
+        /*        
+        try {
+            centerPanel.setVisible(false);
+            List<StudentAttendanceItem> items = FilesUtils.readJsonArrayFromFile("DATA", "cleanData.json");
+            showTable(items);
+        } catch (Exception ex) {
+            Logger.getLogger(MainWin.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
     }
     
     private void startProgressBar(String taskDescription) {
@@ -258,6 +269,15 @@ public class MainWin extends javax.swing.JFrame
                 break;
             case AppConstants.Tasks.REMOVE_DUPLICATES_TASK:
                 List<StudentAttendanceItem> items = StudentAttendanceItem.convert((List<FilteredDataItem>)data);
+                
+        {
+            try {
+                FilesUtils.writeJsontoFile(items, "App data", "cleanData.json");
+            } catch (Exception ex) {
+                Logger.getLogger(MainWin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+                
                 showTable(items);
                 break;
         }
