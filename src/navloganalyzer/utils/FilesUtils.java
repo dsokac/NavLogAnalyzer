@@ -68,11 +68,6 @@ public abstract class FilesUtils {
         }
         Files.write(newFile.toPath(), content.getBytes(charset));
         return newFile;
-        /*FileOutputStream fos = null;
-        Scanner sc = null;
-        fos = new FileOutputStream(new File(location, fileName), false);
-        sc = new Scanner
-        return null;*/
     }
     
     public static File writeToFile(File location, String fileName, List<String> lines, Charset charset) throws FileNotFoundException, IOException {
