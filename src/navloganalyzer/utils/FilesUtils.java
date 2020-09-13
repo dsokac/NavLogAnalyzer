@@ -110,17 +110,14 @@ public abstract class FilesUtils {
         return sb.toString();
     }
     
-    public static File writeToFile(File location, String fileName, String content, Charset charset) throws IOException {
-        File newFile = new File(location, fileName);
-        if(!newFile.exists()) {
-            newFile.createNewFile();
-        }
+    public static File writeToFile(File location, String fileName, String content, Charset charset) throws IOException, Exception {
+        File newFile = getFile(location, fileName, false);
         Files.write(newFile.toPath(), content.getBytes(charset));
         return newFile;
     }
     
-    public static File writeToFile(File location, String fileName, List<String> lines, Charset charset) throws FileNotFoundException, IOException {
-        File file = new File(location, fileName);
+    public static File writeToFile(File location, String fileName, List<String> lines, Charset charset) throws FileNotFoundException, IOException, Exception {
+        File file = getFile(location, fileName);
 	FileOutputStream fos = new FileOutputStream(file);
  
 	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos, charset));
