@@ -63,6 +63,9 @@ public abstract class FilesUtils {
     
     public static File writeToFile(File location, String fileName, String content, Charset charset) throws IOException {
         File newFile = new File(location, fileName);
+        if(!newFile.exists()) {
+            newFile.createNewFile();
+        }
         Files.write(newFile.toPath(), content.getBytes(charset));
         return newFile;
         /*FileOutputStream fos = null;
