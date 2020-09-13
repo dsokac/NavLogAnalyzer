@@ -15,8 +15,8 @@ public class StudentAttendanceItem {
     private String username;
     private Date logOn;
     private Date logOff;
-    private SimpleDateFormat sdfDateTime;
-    private SimpleDateFormat sdfTime;
+    private transient SimpleDateFormat sdfDateTime;
+    private transient SimpleDateFormat sdfTime;
     
     public StudentAttendanceItem(FilteredDataItem dataItem) {
         this.username = dataItem.getUsername();
