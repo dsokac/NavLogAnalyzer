@@ -15,8 +15,8 @@ public class StudentAttendanceItem {
     private String username;
     private Date logOn;
     private Date logOff;
-    private SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd.MM.YYYY. HH:mm");
-    private SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm");
+    private SimpleDateFormat sdfDateTime;
+    private SimpleDateFormat sdfTime;
     
     public StudentAttendanceItem(FilteredDataItem dataItem) {
         this.username = dataItem.getUsername();
@@ -25,6 +25,14 @@ public class StudentAttendanceItem {
         } else if(dataItem.getEventId() == AppConstants.WinEvent.LOG_OFF) {
             this.logOff = dataItem.getCreatedAt();
         }
+        if(sdfDateTime == null || sdfTime == null) {
+            setupFromatters();
+        }
+    }
+    
+    private void setupFromatters() {
+        sdfDateTime = new SimpleDateFormat("dd.MM.YYYY. HH:mm");
+        sdfTime = new SimpleDateFormat("HH:mm");
     }
 
     public String getUsername() {
@@ -60,14 +68,23 @@ public class StudentAttendanceItem {
     }
     
     public String getLogOnTimeFormatted() {
+        if(this.sdfDateTime == null) {
+            setupFromatters();
+        }
         return logOn == null ? "-" : this.sdfDateTime.format(logOn);
     }
     
     public String getLogOffTimeFormatted() {
+        if(sdfDateTime == null) {
+            setupFromatters();
+        }
         return logOff == null ? "-" : this.sdfDateTime.format(logOff);
     }
     
     public String getDifferenceTimeFormatted() {
+        if(this.sdfTime == null) {
+            setupFromatters();
+        }
         String outcome = "-";
         if(logOn != null && logOff != null) {
             long time = logOff.getTime() - logOn.getTime();
