@@ -42,6 +42,10 @@ public abstract class FilesUtils {
         return getFile(null, path, append);
     }
     
+    public static File getFile(File directory, String name) throws Exception {
+        return getFile(directory, name, false);
+    }
+    
     public static File getFile(File directory, String name, boolean append) throws Exception {
         return getFileOrDirectory(directory, name, append);
     }
