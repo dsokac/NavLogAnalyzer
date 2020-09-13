@@ -26,6 +26,51 @@ import java.util.logging.Logger;
 public abstract class FilesUtils {
     public static File getUserWorkingDir() {
         return new File(".");
+    public static File getDirectory(File directory, String name) throws Exception {
+        return getFileOrDirectory(directory, name, false);
+    }
+    
+    public static File getDirectory(String path) throws Exception {
+        return getDirectory(null, path);
+    }
+    
+    public static File getFile(String path) throws Exception {
+        return getFile(null, path, false);
+    }
+    
+    public static File getFile(String path, boolean append) throws Exception {
+        return getFile(null, path, append);
+    }
+    
+    public static File getFile(File directory, String name, boolean append) throws Exception {
+        return getFileOrDirectory(directory, name, append);
+    }
+    
+    public static File getFileOrDirectory(File directory, String name, boolean append) throws Exception {
+        File output = null;
+        if(directory != null) {
+            if(!directory.isDirectory()) {
+                throw new Exception("The location MUST be a directory!!!");
+            }
+            if(!directory.exists()) {
+                directory.mkdirs();
+            }
+            
+            output = new File(directory, name);
+        } else {
+            output = new File(name);
+        }
+        if(output.exists() && append) {
+            output.delete();
+        }
+        if(!output.exists()) {
+            if(output.isDirectory()){
+                output.mkdirs();
+            } else {
+                output.createNewFile();
+            }
+        }
+        return output;
     }
     
     public static String getFileContent(File file, Charset charset) {
