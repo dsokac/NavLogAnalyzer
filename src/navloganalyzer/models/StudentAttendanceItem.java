@@ -9,9 +9,8 @@ import java.util.Map;
 import navloganalyzer.AppConstants;
 
 public class StudentAttendanceItem {
-    
-    private static List<StudentAttendanceItem> resultList = new ArrayList<>();
-    private static Map<String, StudentAttendanceItem> cacheMap = new HashMap<>();
+    private transient static List<StudentAttendanceItem> resultList = new ArrayList<>();
+    private transient static Map<String, StudentAttendanceItem> cacheMap = new HashMap<>();
     
     private String username;
     private Date logOn;
