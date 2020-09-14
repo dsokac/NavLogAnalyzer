@@ -65,28 +65,31 @@ public class FilesUtils {
     
     public File getFileOrDirectory(File directory, String name, boolean append) throws Exception {
         File output = null;
-        if(directory != null) {
-            if(!directory.isDirectory()) {
-                throw new Exception("The location MUST be a directory!!!");
-            }
-            if(!directory.exists()) {
-                directory.mkdirs();
-            }
-            
+        if(directory != null) {            
             output = new File(directory, name);
         } else {
             output = new File(name);
         }
+        
         if(output.exists() && append) {
             output.delete();
         }
         if(!output.exists()) {
-            if(output.isDirectory()){
-                output.mkdirs();
-            } else {
-                output.createNewFile();
+            File parent = output.getParentFile();
+            if(parent != null) {
+                if(!parent.exists()) {
+                    parent.mkdirs();
+                }
             }
-        }
+            String fileName = output.getName();
+            if(!fileName.isEmpty()) {
+                if(fileName.contains(".")) {
+                    output.createNewFile();
+                } else {
+                    output.mkdirs();
+                }
+            }
+        } 
         return output;
     }
     
