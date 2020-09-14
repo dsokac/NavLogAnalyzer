@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import navloganalyzer.models.StudentAttendanceItem;
 
 public class FilesUtils {
     private static FilesUtils INSTANCE = null;
@@ -174,9 +175,9 @@ public class FilesUtils {
     public List<StudentAttendanceItem> readJsonArrayFromFile(String folderName, String fileName) throws Exception {
         File folder = getDirectory(getUserWorkingDir(), folderName);
         File file = getFile(folder, fileName);
-        List<T> items;    
-        java.lang.reflect.Type listType = new TypeToken<List<T>>() {}.getType();
         String content = getFileContent(file, StandardCharsets.UTF_8);
+        List<StudentAttendanceItem> items;    
+        java.lang.reflect.Type listType = new TypeToken<List<StudentAttendanceItem>>() {}.getType();
         items = new Gson().fromJson(content, listType);
         return items;
     }
