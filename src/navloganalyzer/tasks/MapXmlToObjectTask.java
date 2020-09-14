@@ -8,9 +8,6 @@ package navloganalyzer.tasks;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -30,6 +27,7 @@ public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
     private Listener listener;
     private int total = 0;
     private int current = 0;
+    private FilesUtils filesUtils = FilesUtils.getInstance();
     
     public MapXmlToObjectTask(Listener listener) {
         this.listener = listener;
@@ -39,7 +37,7 @@ public class MapXmlToObjectTask extends SwingWorker<List<Events>, Object>{
     protected List<Events> doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.MapXmlToObjectTask.doInBackground()");
         this.listener.onTaskStarted("Mapping XML to Java...");
-        File location = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
+        File location = new File(filesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
         System.out.println(location);
         if(location.exists()) {
             total = location.listFiles().length;

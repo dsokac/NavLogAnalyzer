@@ -5,7 +5,6 @@
  */
 package navloganalyzer.tasks;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ public class RemoveIrrelevantElementsTask extends SwingWorker<List<FilteredDataI
     private int total = 0;
     private int current = 0;
     private List<FilteredDataItem> processedItems = new ArrayList<>();
+    private FilesUtils filesUtils = FilesUtils.getInstance();
     
     public RemoveIrrelevantElementsTask(Listener listener, List<Events> eventsList) {
         this.eventsList = eventsList;
@@ -75,7 +75,7 @@ public class RemoveIrrelevantElementsTask extends SwingWorker<List<FilteredDataI
             lines.add(output);
         }
         try {
-            FilesUtils.writeToFile(FilesUtils.getUserWorkingDir(), "logAnalysis.txt", lines, StandardCharsets.UTF_8);
+            filesUtils.writeToFile(filesUtils.getUserWorkingDir(), "logAnalysis.txt", lines, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(RemoveIrrelevantElementsTask.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {

@@ -23,6 +23,7 @@ public class FileUploadTask extends SwingWorker<File[], Object>{
     private File[] chosenFiles = null;
     private File[] uploadedFiles = null;
     private Listener listener;
+    private FilesUtils filesUtils = FilesUtils.getInstance();
     
     public FileUploadTask(File[] chosenFiles, Listener listener) {
         this.chosenFiles = chosenFiles;
@@ -37,8 +38,8 @@ public class FileUploadTask extends SwingWorker<File[], Object>{
         for(File file : this.chosenFiles) {
             try {
                 System.out.println(file.getAbsolutePath());
-                File folderLocation = new File(FilesUtils.getUserWorkingDir(),AppConstants.Folders.RAW_FILES_ENTRY_LOCATION);
-                File storedFile = FilesUtils.storeFile(folderLocation, file, StandardCharsets.UTF_8);
+                File folderLocation = new File(filesUtils.getUserWorkingDir(),AppConstants.Folders.RAW_FILES_ENTRY_LOCATION);
+                File storedFile = filesUtils.storeFile(folderLocation, file, StandardCharsets.UTF_8);
                 this.uploadedFiles[count++] = storedFile;
                 int progress = (int)((count/(double)this.chosenFiles.length)*100);
                 this.listener.onTaskProgressChanged(progress);

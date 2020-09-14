@@ -22,40 +22,47 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author DanijelSokac
- */
-public abstract class FilesUtils {
-    public static File getUserWorkingDir() {
+public class FilesUtils {
+    private static FilesUtils INSTANCE = null;
+    
+    private FilesUtils() {}
+    
+    public static FilesUtils getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new FilesUtils();
+        }
+        return INSTANCE;
+    }
+    
+    public File getUserWorkingDir() {
         return new File(".");
     }
     
-    public static File getDirectory(File directory, String name) throws Exception {
-        return getFileOrDirectory(directory, name, false);
-    }
-    
-    public static File getDirectory(String path) throws Exception {
+    public File getDirectory(String path) throws Exception {
         return getDirectory(null, path);
     }
     
-    public static File getFile(String path) throws Exception {
+    public File getDirectory(File directory, String name) throws Exception {
+        return getFileOrDirectory(directory, name, false);
+    }
+    
+    public File getFile(String path) throws Exception {
         return getFile(null, path, false);
     }
     
-    public static File getFile(String path, boolean append) throws Exception {
+    public File getFile(String path, boolean append) throws Exception {
         return getFile(null, path, append);
     }
     
-    public static File getFile(File directory, String name) throws Exception {
+    public File getFile(File directory, String name) throws Exception {
         return getFile(directory, name, false);
     }
     
-    public static File getFile(File directory, String name, boolean append) throws Exception {
+    public File getFile(File directory, String name, boolean append) throws Exception {
         return getFileOrDirectory(directory, name, append);
     }
     
-    public static File getFileOrDirectory(File directory, String name, boolean append) throws Exception {
+    public File getFileOrDirectory(File directory, String name, boolean append) throws Exception {
         File output = null;
         if(directory != null) {
             if(!directory.isDirectory()) {
@@ -82,7 +89,7 @@ public abstract class FilesUtils {
         return output;
     }
     
-    public static String getFileContent(File file, Charset charset) {
+    public String getFileContent(File file, Charset charset) {
         StringBuilder sb = new StringBuilder();   
         FileInputStream inputStream = null;
 	Scanner sc = null;
@@ -115,13 +122,13 @@ public abstract class FilesUtils {
         return sb.toString();
     }
     
-    public static File writeToFile(File location, String fileName, String content, Charset charset) throws IOException, Exception {
+    public File writeToFile(File location, String fileName, String content, Charset charset) throws IOException, Exception {
         File newFile = getFile(location, fileName, false);
         Files.write(newFile.toPath(), content.getBytes(charset));
         return newFile;
     }
     
-    public static File writeToFile(File location, String fileName, List<String> lines, Charset charset) throws FileNotFoundException, IOException, Exception {
+    public File writeToFile(File location, String fileName, List<String> lines, Charset charset) throws FileNotFoundException, IOException, Exception {
         File file = getFile(location, fileName);
 	FileOutputStream fos = new FileOutputStream(file);
  
@@ -136,7 +143,7 @@ public abstract class FilesUtils {
         return file;
     }
     
-    public static File storeFile(File location, File file, Charset charset) throws Exception {
+    public File storeFile(File location, File file, Charset charset) throws Exception {
         if(!location.isDirectory()) {
             throw new Exception("The location MUST be a directory!!!");
         }
@@ -147,16 +154,16 @@ public abstract class FilesUtils {
         return writeToFile(location, file.getName(), content, charset);
     }
     
-    public static File storeFile(File location, String filename, String content, Charset charset) throws Exception {
+    public File storeFile(File location, String filename, String content, Charset charset) throws Exception {
         return writeToFile(location, filename, content, charset);
     }
     
-    public static void writeJsontoFile(Object data, String folderName, String fileName) throws Exception {
-        File dataFolder = getDirectory(FilesUtils.getUserWorkingDir(), folderName);
+    public void writeJsontoFile(Object data, String folderName, String fileName) throws Exception {
+        File dataFolder = getDirectory(getUserWorkingDir(), folderName);
         
         String content = new Gson().toJson(data);
         try {
-            FilesUtils.storeFile(dataFolder, fileName, content, StandardCharsets.UTF_8);
+            storeFile(dataFolder, fileName, content, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(FilesUtils.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
@@ -164,12 +171,12 @@ public abstract class FilesUtils {
         }
     }
     
-    public static <T> List<T> readJsonArrayFromFile(String folderName, String fileName) throws Exception {
-        File folder = getDirectory(FilesUtils.getUserWorkingDir(), folderName);
+    public List<StudentAttendanceItem> readJsonArrayFromFile(String folderName, String fileName) throws Exception {
+        File folder = getDirectory(getUserWorkingDir(), folderName);
         File file = getFile(folder, fileName);
-        String content = FilesUtils.getFileContent(file, StandardCharsets.UTF_8);
         List<T> items;    
         java.lang.reflect.Type listType = new TypeToken<List<T>>() {}.getType();
+        String content = getFileContent(file, StandardCharsets.UTF_8);
         items = new Gson().fromJson(content, listType);
         return items;
     }

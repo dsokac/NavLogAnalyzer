@@ -19,6 +19,7 @@ public class RemoveDuplicatesTask extends SwingWorker<List<FilteredDataItem>, Ob
     private int total;
     private int current = 0;
     private List<FilteredDataItem> processedItems = new ArrayList<>();
+    private FilesUtils filesUtils = FilesUtils.getInstance();
     
     public RemoveDuplicatesTask(List<FilteredDataItem> filteredItems, Listener listener) {
         this.filteredItems = filteredItems;
@@ -79,7 +80,7 @@ public class RemoveDuplicatesTask extends SwingWorker<List<FilteredDataItem>, Ob
             lines.add(output);
         }
         try {
-            FilesUtils.writeToFile(FilesUtils.getUserWorkingDir(), "logAnalysis-noDuplicates.txt", lines, StandardCharsets.UTF_8);
+            filesUtils.writeToFile(filesUtils.getUserWorkingDir(), "logAnalysis-noDuplicates.txt", lines, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(RemoveIrrelevantElementsTask.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {

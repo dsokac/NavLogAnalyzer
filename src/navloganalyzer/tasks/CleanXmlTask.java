@@ -15,6 +15,7 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
     private int currentProgress = 0;
     private int totalProgress = -1;
     private Listener listener;
+    private FilesUtils filesUtils = FilesUtils.getInstance();
     
     public CleanXmlTask(Charset charset, Listener listener) {
         this.charset = charset;
@@ -25,8 +26,8 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
     protected Void doInBackground() throws Exception {
         System.out.println("navloganalyzer.tasks.CleanXmlTask.doInBackground()");
         listener.onTaskStarted("Cleaning files...");
-        File rawFilesLocation = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.RAW_FILES_ENTRY_LOCATION);
-        File cleanFilesLocation = new File(FilesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
+        File rawFilesLocation = new File(filesUtils.getUserWorkingDir(), AppConstants.Folders.RAW_FILES_ENTRY_LOCATION);
+        File cleanFilesLocation = new File(filesUtils.getUserWorkingDir(), AppConstants.Folders.CLEANED_FILES_LOCATION);
         
         if(!cleanFilesLocation.exists()) {
             cleanFilesLocation.mkdirs();
@@ -37,9 +38,9 @@ public class CleanXmlTask extends SwingWorker<Void, Object> implements ProgressL
             for(File item : rawFilesLocation.listFiles()){
                 if(item.isFile()) {
                     String fileName = item.getName();
-                    String content = FilesUtils.getFileContent(item, charset);
+                    String content = filesUtils.getFileContent(item, charset);
                     content = XmlUtils.removeRows(content, this);
-                    FilesUtils.storeFile(cleanFilesLocation, fileName, content, charset);
+                    filesUtils.storeFile(cleanFilesLocation, fileName, content, charset);
                 }
             }
         }
