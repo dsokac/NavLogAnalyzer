@@ -67,7 +67,6 @@ public class DataTablePanel extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
-        analysisTable.setColumnSelectionAllowed(true);
         jScrollPane1.setViewportView(analysisTable);
         analysisTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
@@ -110,7 +109,6 @@ public class DataTablePanel extends javax.swing.JPanel {
         );
 
         jLabel1.getAccessibleContext().setAccessibleName("Student");
-        jLabel1.getAccessibleContext().setAccessibleDescription("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
