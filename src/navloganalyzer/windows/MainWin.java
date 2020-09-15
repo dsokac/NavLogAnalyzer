@@ -215,14 +215,14 @@ public class MainWin extends javax.swing.JFrame
         
         
         addComponentListener(componentAdapter);
-                
+       /*         
         try {
             centerPanel.setVisible(false);
             List<StudentAttendanceItem> items = filesUtils.<StudentAttendanceItem>readJsonArrayFromFile("App Data", "cleanData.json");
             showTable(items);
         } catch (Exception ex) {
             Logger.getLogger(MainWin.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
     
     private void startProgressBar(String taskDescription) {
@@ -271,13 +271,13 @@ public class MainWin extends javax.swing.JFrame
             case AppConstants.Tasks.REMOVE_DUPLICATES_TASK:
                 List<StudentAttendanceItem> items = StudentAttendanceItem.convert((List<FilteredDataItem>)data);
                 
-        /*{
+        {
             try {
                 filesUtils.writeJsontoFile(items, "App data", "cleanData.json");
             } catch (Exception ex) {
                 Logger.getLogger(MainWin.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }*/
+        }
                 
                 showTable(items);
                 break;
@@ -285,7 +285,7 @@ public class MainWin extends javax.swing.JFrame
     }
     
     public void showTable(List<StudentAttendanceItem> data) {
-        dataTablePanel = new DataTablePanel();
+        dataTablePanel = new DataTablePanel(this);
         dataTablePanel.populateTable(data);
         this.centerPanel.setVisible(false);
         this.mainPanel.setSize(getSize());

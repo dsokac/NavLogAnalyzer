@@ -9,7 +9,7 @@ import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 public abstract class DatePickerUtils {
-    public static void initializeDatePicker(JPanel container) {
+    public static JDatePickerImpl initializeDatePicker(JPanel container) {
         DateModel model = new UtilDateModel();
         Properties p = new Properties();
         p.setProperty("text.today", "Danas");
@@ -23,5 +23,6 @@ public abstract class DatePickerUtils {
         datePicker.setVisible(true);
         container.add(datePicker);
         container.validate();
-    }
+        return datePicker;
+    } 
 }

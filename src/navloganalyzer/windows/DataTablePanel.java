@@ -6,17 +6,29 @@
 package navloganalyzer.windows;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import navloganalyzer.AppConstants;
 import navloganalyzer.datepicker.DatePickerUtils;
 import navloganalyzer.models.StudentAttendanceItem;
 import navloganalyzer.utils.MyStringUtils;
+import org.jdatepicker.impl.JDatePickerImpl;
+import sun.util.calendar.CalendarSystem;
 
 /**
  *
@@ -27,7 +39,8 @@ public class DataTablePanel extends javax.swing.JPanel {
     /**
      * Creates new form DataTablePanel
      */
-    public DataTablePanel() {
+    public DataTablePanel(Component parent) {
+        this.parent = parent;
         initComponents();
         setVisible(true);
     }
@@ -47,6 +60,10 @@ public class DataTablePanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         cbxStudents = new javax.swing.JComboBox<>();
         datePickerPanel = new javax.swing.JPanel();
+        btnTimeFilter = new javax.swing.JButton();
+        btnClearTimeFilters = new javax.swing.JButton();
+        btnClearAllFilters = new javax.swing.JButton();
+        btnAnalysis = new javax.swing.JButton();
 
         analysisTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -82,6 +99,14 @@ public class DataTablePanel extends javax.swing.JPanel {
 
         datePickerPanel.setLayout(new java.awt.GridBagLayout());
 
+        btnTimeFilter.setText("Filtriraj");
+
+        btnClearTimeFilters.setText("Očisti vremensko ograničenje");
+
+        btnClearAllFilters.setText("Očisti sve filtere");
+
+        btnAnalysis.setText("Analiziraj");
+
         javax.swing.GroupLayout tableOptionsPanelLayout = new javax.swing.GroupLayout(tableOptionsPanel);
         tableOptionsPanel.setLayout(tableOptionsPanelLayout);
         tableOptionsPanelLayout.setHorizontalGroup(
@@ -89,23 +114,42 @@ public class DataTablePanel extends javax.swing.JPanel {
             .addGroup(tableOptionsPanelLayout.createSequentialGroup()
                 .addGap(27, 27, 27)
                 .addGroup(tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(datePickerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(tableOptionsPanelLayout.createSequentialGroup()
+                        .addGap(222, 222, 222)
+                        .addComponent(datePickerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(tableOptionsPanelLayout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbxStudents, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(759, Short.MAX_VALUE))
+                        .addComponent(cbxStudents, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tableOptionsPanelLayout.createSequentialGroup()
+                        .addComponent(btnClearAllFilters)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAnalysis)))
+                .addGap(18, 18, 18)
+                .addComponent(btnTimeFilter)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnClearTimeFilters)
+                .addContainerGap(571, Short.MAX_VALUE))
         );
         tableOptionsPanelLayout.setVerticalGroup(
             tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tableOptionsPanelLayout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnTimeFilter)
+                        .addComponent(btnClearTimeFilters))
+                    .addGroup(tableOptionsPanelLayout.createSequentialGroup()
+                        .addGroup(tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(cbxStudents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(datePickerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addGroup(tableOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(cbxStudents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(datePickerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(35, Short.MAX_VALUE))
+                    .addComponent(btnClearAllFilters)
+                    .addComponent(btnAnalysis))
+                .addContainerGap())
         );
 
         jLabel1.getAccessibleContext().setAccessibleName("Student");
@@ -114,29 +158,31 @@ public class DataTablePanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 986, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tableOptionsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tableOptionsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1044, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tableOptionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tableOptionsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(115, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(107, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable analysisTable;
+    private javax.swing.JButton btnAnalysis;
+    private javax.swing.JButton btnClearAllFilters;
+    private javax.swing.JButton btnClearTimeFilters;
+    private javax.swing.JButton btnTimeFilter;
     private javax.swing.JComboBox<String> cbxStudents;
     private javax.swing.JPanel datePickerPanel;
     private javax.swing.JLabel jLabel1;
@@ -148,29 +194,83 @@ public class DataTablePanel extends javax.swing.JPanel {
     private int height = -1;
     private List<StudentAttendanceItem> originalData = new ArrayList<>();
     private List<StudentAttendanceItem> data = new ArrayList<>();
+    private Date dateTimeFrom = null;
+    private Date dateTimeTo = null;
+    private Component parent = null;
+    private JDatePickerImpl datePickerFrom = null;
+    private JDatePickerImpl datePickerTo = null;
+    private String username = null;
+    private List<String> studentList;
 
     public void populateTable(List<StudentAttendanceItem> data) {
         populateTable(data, false);
     }
     
-    public void populateTable(List<StudentAttendanceItem> data, boolean isFiltering) {
+    public void populateTable(List<StudentAttendanceItem> passedData, boolean isFiltering) {
         if(isFiltering) {
-            this.data = data;
+            this.data = passedData;
         } else {
-            this.originalData = data;
+            this.originalData = passedData;
         }
         DefaultTableModel tModel = (DefaultTableModel) analysisTable.getModel();
         tModel.setRowCount(0);
-        for(StudentAttendanceItem item : data) {
+        for(StudentAttendanceItem item : passedData) {
             tModel.addRow(item.getRow());
         }
         validate();
         
         if(!isFiltering) {
-            List<String> studentList = extractStudentsForCombobox(data);
+            studentList = extractStudentsForCombobox(passedData);
             MyStringUtils.sortListItems(studentList);
             setupCombobox(studentList);
-            DatePickerUtils.initializeDatePicker(datePickerPanel);
+            setupDatePicker();
+            btnTimeFilter.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    filterByTimeConstraint();
+                }
+            });
+            
+            btnClearTimeFilters.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    resetDatePickers();
+                    data = originalData;
+                    filterData();
+                }
+            });
+            
+            btnClearAllFilters.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbxStudents.setSelectedIndex(0);
+                    resetDatePickers();
+                    populateTable(originalData, true);
+                }
+            });
+            
+            btnAnalysis.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<String> options = new ArrayList<>();
+                    options.add("Odaberi...");
+                    options.addAll(studentList);
+                    
+                    String s = (String)JOptionPane.showInputDialog(
+                                        parent,
+                                        "Odaberi studenta/studenticu za analizu:\n",
+                                        "Odaberi studenta za analizu",
+                                        JOptionPane.PLAIN_MESSAGE,
+                                        null,
+                                        options.toArray(),
+                                        "Odaberi...");
+
+                    //If a string was returned, say so.
+                    if ((s != null) && (s.length() > 0)) {
+                        System.out.println(".actionPerformed() dialog win =>> " + s);
+                    }
+                }
+            });
         }
     }
     
@@ -196,19 +296,98 @@ public class DataTablePanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 String selectedValue = (String)((JComboBox)e.getSource()).getSelectedItem();
                 System.out.println(".actionPerformed() => " + selectedValue);
-                filterData(selectedValue);
+                data = originalData;
+                username = cbxStudents.getSelectedIndex() != 0 ? selectedValue : null;
+                if(cbxStudents.getSelectedIndex() != 0) {
+                    filterData();
+                } else {
+                    populateTable(originalData, true);
+                }
+                if(dateTimeTo != null || dateTimeFrom != null) {
+                    filterByTimeConstraint();
+                }
             }
         });
     }
     
-    private void filterData(String key) {
+    private void filterData() {
         Predicate<StudentAttendanceItem> predicate = new Predicate<StudentAttendanceItem>() {
             @Override
             public boolean test(StudentAttendanceItem t) {
-               return t.getUsername().equals(key);
+               return t.getUsername().equals(username);
             }
         };
-        this.data = this.originalData.stream().filter(predicate).collect(Collectors.toList());
+        this.data = this.data.stream().filter(predicate).collect(Collectors.toList());
+        populateTable(data, true);
+    }
+    
+    private void setupDatePicker() {
+        JLabel firstLabel = new JLabel("Vremenski period(od-do):   ");
+        datePickerPanel.add(firstLabel);
+        DatePickerUtils.initializeDatePicker(datePickerPanel);
+        JLabel secondLabel = new JLabel("  -  ");
+        datePickerPanel.add(secondLabel);
+        DatePickerUtils.initializeDatePicker(datePickerPanel);
+
+        datePickerFrom = (JDatePickerImpl)datePickerPanel.getComponent(1);
+        datePickerTo = (JDatePickerImpl)datePickerPanel.getComponent(3);
+        datePickerFrom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               String value = datePickerFrom.getJFormattedTextField().getText();
+                System.out.println(".actionPerformed() => dateFrom = " + value);
+                dateTimeFrom = (Date)datePickerFrom.getModel().getValue();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateTimeFrom);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                dateTimeFrom = cal.getTime();
+                System.out.println(".actionPerformed() => dateFrom = " + dateTimeFrom);
+            }
+        });
+        datePickerTo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String value = datePickerTo.getJFormattedTextField().getText();
+                System.out.println(".actionPerformed() => dateTo = " + value);
+                dateTimeTo = (Date)datePickerTo.getModel().getValue();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateTimeTo);
+                cal.set(Calendar.HOUR_OF_DAY, 23);
+                cal.set(Calendar.MINUTE, 59);
+                cal.set(Calendar.SECOND, 59);
+                dateTimeTo = cal.getTime();
+                System.out.println(".actionPerformed() => dateTo = " + dateTimeTo);
+                if(dateTimeFrom != null && dateTimeTo.before(dateTimeFrom)) {
+                    JOptionPane.showMessageDialog(parent,
+                        "Završni datum ne može biti prije početnog datuma!",
+                        "Upozorenje",
+                        JOptionPane.WARNING_MESSAGE);
+                    resetDatePickers();
+                }
+            }
+        });
+    }
+    
+    private void resetDatePickers() {
+        datePickerTo.getJFormattedTextField().setText("");
+        datePickerTo.getModel().setSelected(false);
+        datePickerFrom.getJFormattedTextField().setText("");
+        datePickerFrom.getModel().setSelected(false);
+        dateTimeFrom = null;
+        dateTimeTo = null;
+    }
+    
+    private void filterByTimeConstraint() {
+        Predicate<StudentAttendanceItem> predicate = new Predicate<StudentAttendanceItem>() {
+            @Override
+            public boolean test(StudentAttendanceItem t) {
+               return (t.getLogOn() != null && dateTimeFrom.before(t.getLogOn())) && 
+                       (t.getLogOff() != null && dateTimeTo.after(t.getLogOff()));
+            }
+        };
+        this.data = this.data.stream().filter(predicate).collect(Collectors.toList());
         populateTable(data, true);
     }
 }
