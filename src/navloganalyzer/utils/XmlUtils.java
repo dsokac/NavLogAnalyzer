@@ -10,6 +10,7 @@ import navloganalyzer.models.raw_models.RawDataElementWithSingleNameAttributeSpe
 public abstract class XmlUtils {
     public static String removeRows(String content, ProgressListener listener) {
         ArrayList<RawElementSimpleSpecs> elements = new ArrayList<>();
+        elements.add(new RawElementSimpleSpecs("Message", false));
         elements.add(new RawElementSimpleSpecs("Provider", true));
         elements.add(new RawElementSimpleSpecs("Version", false));
         elements.add(new RawElementSimpleSpecs("Level", false));
@@ -21,6 +22,7 @@ public abstract class XmlUtils {
         elements.add(new RawElementSimpleSpecs("Correlation", true));
         elements.add(new RawElementSimpleSpecs("Execution", true));
         elements.add(new RawElementSimpleSpecs("Security", true));
+        elements.add(new RawDataElementWithSingleNameAttributeSpecs("PrivilegeList"));
         elements.add(new RawDataElementWithSingleNameAttributeSpecs("TargetUserSid"));
         elements.add(new RawDataElementWithSingleNameAttributeSpecs("TargetLogonId"));
         elements.add(new RawDataElementWithSingleNameAttributeSpecs("SubjectUserSid"));
