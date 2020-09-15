@@ -22,7 +22,7 @@ public class RawDataElementWithSingleNameAttributeSpecs extends RawElementSimple
 
     @Override
     public String getPattern() {
-        String pattern = String.format(selfContained ? "<%s.*%s=\"%s\".*\\/>" : "<%s.*%s=\"%s\".*>", key, attributeName, attributeValue);
+        String pattern = String.format(selfContained ? "<%s.*%s=\"%s\".*\\/>" : "<%s %s=('|\")%s('|\")>[\\s\\S]*?<\\/%1$s>", key, attributeName, attributeValue);
         return pattern;
     }
     

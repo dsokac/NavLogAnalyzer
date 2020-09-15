@@ -18,7 +18,7 @@ public class RawElementSimpleSpecs {
     }
     
     public String getPattern() {
-        String pattern = String.format(selfContained ? "<%s.*\\/>" : "<%s.*>", key);
+        String pattern = String.format(selfContained ? "<%s.*\\/>" : "<%s>[\\s\\S]*?</%<s>", key);
         return pattern;
     }
 }
