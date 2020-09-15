@@ -148,12 +148,6 @@ public class FilesUtils {
     }
     
     public File storeFile(File location, File file, Charset charset) throws Exception {
-        if(!location.isDirectory()) {
-            throw new Exception("The location MUST be a directory!!!");
-        }
-        if(!location.exists()) {
-            location.mkdirs();
-        }
         String content = getFileContent(file, charset);
         return writeToFile(location, file.getName(), content, charset);
     }
